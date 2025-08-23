@@ -30,14 +30,17 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Create Cordova Project
-      run: cordova create temp_build com.shelley021.recipes "智能食谱"
-
+    # --- 核心修改：在创建项目后，立刻添加安卓平台 ---
+    - name: Create Cordova Project and Add Android Platform
+      run: |
+        cordova create temp_build com.shelley021.recipes "智能食谱"
+        cd temp_build
+        cordova platform add android@11
+    
     - name: Copy Web Assets and Config
       run: |
         cp ./index.html ./temp_build/www/
         cp ./app.js ./temp_build/www/
-        cp -r ./API ./temp_build/www/
         cp ./config.xml ./temp_build/
     
     - name: Install Android Build Tools
