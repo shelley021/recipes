@@ -18,6 +18,14 @@ jobs:
       with:
         node-version: '18'
 
+    # 1. 安装项目依赖 (React, Tailwind等)
+    - name: Install Dependencies
+      run: npm install
+
+    # 2. 编译React应用 (这会生成一个 build 文件夹)
+    - name: Build React App
+      run: npm run build
+
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
@@ -30,18 +38,19 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    # --- 核心修改：在创建项目后，立刻添加安卓平台 ---
     - name: Create Cordova Project and Add Android Platform
       run: |
-        cordova create temp_build com.shelley021.recipes "智能食谱"
+        cordova create temp_build com.shelley021.recipes "智能食<em></em>食谱"
         cd temp_build
         cordova platform add android@11
     
-    - name: Copy Web Assets and Config
+    # 3. 将“编译后”的网页文件和数据复制到打包目录
+    - name: Copy Built Assets and Config
       run: |
-        cp ./index.html ./temp_build/www/
-        cp ./app.js ./temp_build/www/
-        cp ./config.xml ./temp_build/
+        # 将 build 文件夹里的所有内容复制到 www 目录
+        cp -r build/* ./temp_build/www/
+        # 复制配置文件
+        cp config.xml ./temp_build/
     
     - name: Install Android Build Tools
       run: yes | sdkmanager --licenses > /dev/null && sdkmanager "build-tools;32.0.0"
