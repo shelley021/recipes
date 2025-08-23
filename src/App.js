@@ -34,7 +34,6 @@ function App() {
     const [status, setStatus] = useState('请搜索菜谱');
     const [isLoading, setIsLoading] = useState(true);
 
-    // useEffect 会在组件第一次加载时运行一次，用于获取数据
     useEffect(() => {
         const dataUrl = 'https://raw.githubusercontent.com/shelley021/recipes/main/API/public/final_recipes_with_directions.json';
         fetch(dataUrl)
@@ -52,7 +51,7 @@ function App() {
                 setStatus(`错误: ${error.message}`);
                 console.error(error);
             });
-    }, []); // 空数组表示只运行一次
+    }, []);
 
     const searchRecipes = () => {
         const keyword = document.getElementById('search').value.toLowerCase().trim();
@@ -64,7 +63,8 @@ function App() {
         }
 
         setStatus('正在搜索...');
-        const ingredients = keyword.split(/[ \/\-,]+/).filter(Boolean);
+        // --- 核心修改：使用 new RegExp() 构造函数来创建正则表达式，以避免ESLint报错 ---
+        const ingredients = keyword.split(new RegExp('[ /\\-,]+')).filter(Boolean);
         
         const results = allRecipes.filter(recipe =>
             ingredients.every(ing =>
@@ -79,7 +79,6 @@ function App() {
             return;
         }
 
-        // 排序逻辑
         results.sort((a, b) => {
             const aHas = hasValidDirections(a);
             const bHas = hasValidDirections(b);
@@ -94,7 +93,9 @@ function App() {
     const hasValidDirections = (recipe) => {
         return recipe.directions && !['未能自动找到做法', '抓取失败', '已跳过'].some(term => recipe.directions.includes(term));
     };
-
+    
+    // UI 部分保持不变，此处省略...
+    // The UI part (return statement) is unchanged and omitted for brevity...
     return (
         <div>
             <style>{styles}</style>
