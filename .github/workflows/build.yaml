@@ -1,0 +1,60 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Create Cordova Project
+      run: cordova create temp_build com.shelley021.recipes "智能食谱"
+
+    - name: Copy Web Assets and Config
+      run: |
+        cp ./index.html ./temp_build/www/
+        cp ./app.js ./temp_build/www/
+        cp -r ./API ./temp_build/www/
+        cp ./config.xml ./temp_build/
+    
+    - name: Install Android Build Tools
+      run: yes | sdkmanager --licenses > /dev/null && sdkmanager "build-tools;32.0.0"
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.4'
+
+    - name: Build Android Debug APK
+      run: |
+        cd temp_build
+        cordova build android --debug -- --packageType=apk
+
+    - name: Upload APK as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-debug-apk
+        path: temp_build/platforms/android/app/build/outputs/apk/debug/app-debug.apk
