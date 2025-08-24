@@ -104,7 +104,7 @@ function App() {
     const [modalRecipe, setModalRecipe] = useState(null);
 
     useEffect(() => {
-        const dataUrl = 'https://raw.githubusercontent.com/shelley021/recipes/main/API/public/final_recipes_with_directions.json';
+        const dataUrl = 'https://recipes-1373426606.cos.ap-shanghai.myqcloud.com/final_recipes_with_directions.json';
         fetch(dataUrl)
             .then(response => {
                 if (!response.ok) throw new Error('在线数据文件加载失败');
