@@ -13,4 +13,5 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="AndroidXEnabled" value="true" />
+    <preference name="MixedContentMode" value="2" />
 </widget>
