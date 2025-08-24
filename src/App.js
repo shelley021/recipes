@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// 将CSS样式直接写在JS文件中
+// CSS styles remain the same
 const styles = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
   .search-container { margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -14,9 +14,9 @@ const styles = `
   button { padding: 8px 15px; margin: 0 5px; cursor: pointer; border: none; background-color: #007bff; color: white; border-radius: 4px; font-size: 14px; transition: background-color 0.2s; }
   button:hover { background-color: #0056b3; }
   button:disabled { background-color: #ccc; cursor: not-allowed; }
-  .pagination { margin-top: 20px; width: 100%; text-align: center; }
+  .pagination { margin-top: 20px; margin-bottom: 20px; width: 100%; text-align: center; display: flex; justify-content: center; align-items: center; gap: 5px; }
   .pagination span, .pagination input { margin: 0 5px; }
-  .pagination input { padding: 5px; width: 50px; text-align: center; }
+  .pagination input { padding: 5px; width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;}
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; display: flex; justify-content: center; align-items: center; }
   .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 90%; width: 700px; max-height: 85%; overflow-y: auto; position: relative; line-height: 1.6; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: width 0.3s, height 0.3s; }
   .modal-content-maximized { width: 95%; max-width: 95%; height: 95%; max-height: 95%; }
@@ -28,7 +28,7 @@ const styles = `
   .modal-btn:hover { background: #d0d0d0; }
 `;
 
-// 辅助函数：判断菜谱是否有有效的做法
+// Helper function remains the same
 function hasValidDirections(recipe) {
     return recipe.directions &&
         !recipe.directions.includes('未能自动找到做法') &&
@@ -36,7 +36,7 @@ function hasValidDirections(recipe) {
         !recipe.directions.includes('已跳过');
 }
 
-// 弹窗组件
+// Modal component remains the same
 function Modal({ recipe, onClose }) {
     const [isMaximized, setIsMaximized] = useState(false);
 
@@ -84,19 +84,67 @@ function Modal({ recipe, onClose }) {
                         (recipe.directions.match(/[^.!?]+[.!?]+/g) || [recipe.directions]).map((s, i) => <p key={i}>{s.trim()}</p>)
                         : '抱歉，该菜谱的做法未能自动获取。'}
                 </div>
-                
             </div>
         </div>
     );
 }
 
-// 主应用组件
+// NEW: Pagination Component
+function Pagination({ currentPage, totalPages, onPageChange }) {
+    const [jumpPage, setJumpPage] = useState(String(currentPage));
+
+    useEffect(() => {
+        setJumpPage(String(currentPage));
+    }, [currentPage]);
+
+    const handleJump = () => {
+        const page = parseInt(jumpPage, 10);
+        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+            onPageChange(page);
+        } else {
+            alert(`请输入1到${totalPages}之间的有效页码`);
+            setJumpPage(String(currentPage));
+        }
+    };
+    
+    if (totalPages <= 1) {
+        return null; // Don't render pagination if there's only one page
+    }
+
+    return (
+        <div className="pagination">
+            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+                上一页
+            </button>
+            <span>
+                第 {currentPage} / {totalPages} 页
+            </span>
+            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                下一页
+            </button>
+            <input 
+                type="number"
+                value={jumpPage}
+                onChange={(e) => setJumpPage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleJump()}
+            />
+            <button onClick={handleJump}>跳转</button>
+        </div>
+    );
+}
+
+
+// Main App Component (with modifications)
 function App() {
     const [allRecipes, setAllRecipes] = useState([]);
     const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [status, setStatus] = useState('请搜索菜谱');
     const [isLoading, setIsLoading] = useState(true);
     const [modalRecipe, setModalRecipe] = useState(null);
+
+    // NEW: State for pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
 
     useEffect(() => {
         const dataUrl = 'https://recipes-1373426606.cos.ap-shanghai.myqcloud.com/final_recipes_with_directions.json';
@@ -151,7 +199,15 @@ function App() {
 
         setFilteredRecipes(results);
         setStatus(`找到了 ${results.length} 个菜谱。`);
+        // MODIFIED: Reset to page 1 on new search
+        setCurrentPage(1); 
     };
+
+    // NEW: Pagination Logic
+    const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentRecipes = filteredRecipes.slice(startIndex, endIndex);
 
     return (
         <div>
@@ -170,23 +226,34 @@ function App() {
                 </button>
             </div>
             
+            {/* NEW: Render Pagination Component */}
+            <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+            />
+
             <p>{status}</p>
 
             <div className="results">
-                {filteredRecipes.slice(0, 200).map(recipe => ( // 增加显示数量
-                    <div key={recipe._id.$oid} className="recipe">
+                {/* MODIFIED: Map over current page's recipes instead of all filtered recipes */}
+                {currentRecipes.map(recipe => (
+                    <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
                         {recipe.image && <img src={recipe.image} alt={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
-                            {(recipe.ingredients || '').split('\n').slice(0, 3).join('<br>')}
+                            {/* Note: React doesn't render <br> from strings by default for security. 
+                                This part's display might be different than intended.
+                                A better way would be to map over the lines and render them in separate divs or spans.
+                            */}
+                            {(recipe.ingredients || '').split('\n').slice(0, 3).join('\n')}
                         </p>
                         <button onClick={() => setModalRecipe(recipe)}>查看做法</button>
                     </div>
                 ))}
             </div>
 
-            {/* 当 modalRecipe 有值时，渲染弹窗组件 */}
             {modalRecipe && <Modal recipe={modalRecipe} onClose={() => setModalRecipe(null)} />}
         </div>
     );
