@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.shelley021.recipes" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.shelley021.recipes" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>智能食谱</name>
     <description>
         A smart recipe search application.
@@ -13,5 +13,12 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="AndroidXEnabled" value="true" />
-    <preference name="MixedContentMode" value="2" />
+    
+    <!-- 核心修改：增加一个 platform 块，专门为安卓平台配置权限 -->
+    <platform name="android">
+        <!-- 这一行是允许HTTP和HTTPS混合内容的关键 -->
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:usesCleartextTraffic="true" />
+        </edit-config>
+    </platform>
 </widget>
