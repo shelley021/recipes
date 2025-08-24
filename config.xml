@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.shelley021.recipes" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget id="com.shelley021.recipes" version="1.0.0" xmlns="https://www.w3.org/ns/widgets" xmlns:android="https://schemas.android.com/apk/res/android">
     <name>智能食谱</name>
     <description>
         A smart recipe search application.
     </description>
-    <author email="dev@example.com" href="http://example.com">
+    <author email="dev@example.com" href="https://example.com">
         Your Name
     </author>
     <content src="index.html" />
     <access origin="*" />
     <allow-navigation href="*" />
-    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="AndroidXEnabled" value="true" />
     

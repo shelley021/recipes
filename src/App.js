@@ -84,12 +84,7 @@ function Modal({ recipe, onClose }) {
                         (recipe.directions.match(/[^.!?]+[.!?]+/g) || [recipe.directions]).map((s, i) => <p key={i}>{s.trim()}</p>)
                         : '抱歉，该菜谱的做法未能自动获取。'}
                 </div>
-
-                {recipe.url && (
-                    <a href={recipe.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: '20px' }}>
-                        查看原始网页（尊重版权）
-                    </a>
-                )}
+                
             </div>
         </div>
     );
