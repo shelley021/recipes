@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// 图片代理服务器前缀
+// 图片代理服务器前缀.
 const PROXY_PREFIX = 'https://www.pocketfoxden.shop/image-proxy/';
 
 const getProxiedUrl = (originalUrl) => {
