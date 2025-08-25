@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-// --- 新增代码开始 ---
-const PROXY_PREFIX = 'http://139.180.190.178/image-proxy/';
+// 图片代理服务器前缀
+const PROXY_PREFIX = 'https://www.pocketfoxden.shop/image-proxy/';
 
 const getProxiedUrl = (originalUrl) => {
   if (originalUrl && typeof originalUrl === 'string' && !originalUrl.startsWith('data:')) {
     return PROXY_PREFIX + originalUrl;
   }
-  return originalUrl; // 如果URL为空或已经是data URL，则返回原样
+  return originalUrl;
 };
-// --- 新增代码结束 ---
 
-
-// CSS styles remain the same
+// CSS样式 (无变化)
 const styles = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
   .search-container { margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -40,7 +38,7 @@ const styles = `
   .modal-btn:hover { background: #d0d0d0; }
 `;
 
-// Helper function remains the same
+// 辅助函数 (无变化)
 function hasValidDirections(recipe) {
     return recipe.directions &&
         !recipe.directions.includes('未能自动找到做法') &&
@@ -48,7 +46,7 @@ function hasValidDirections(recipe) {
         !recipe.directions.includes('已跳过');
 }
 
-// Modal component remains the same
+// 弹窗组件 (无变化)
 function Modal({ recipe, onClose }) {
     const [isMaximized, setIsMaximized] = useState(false);
 
@@ -101,7 +99,7 @@ function Modal({ recipe, onClose }) {
     );
 }
 
-// NEW: Pagination Component
+// 分页组件 (无变化)
 function Pagination({ currentPage, totalPages, onPageChange }) {
     const [jumpPage, setJumpPage] = useState(String(currentPage));
 
@@ -114,13 +112,13 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         if (!isNaN(page) && page >= 1 && page <= totalPages) {
             onPageChange(page);
         } else {
-            alert(`请输入1到${totalPages}之间的有效页码`);
+            console.error(`请输入1到${totalPages}之间的有效页码`);
             setJumpPage(String(currentPage));
         }
     };
     
     if (totalPages <= 1) {
-        return null; // Don't render pagination if there's only one page
+        return null;
     }
 
     return (
@@ -146,20 +144,20 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
 }
 
 
-// Main App Component (with modifications)
+// 主应用组件
 function App() {
     const [allRecipes, setAllRecipes] = useState([]);
     const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [status, setStatus] = useState('请搜索菜谱');
     const [isLoading, setIsLoading] = useState(true);
     const [modalRecipe, setModalRecipe] = useState(null);
-
-    // NEW: State for pagination
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 20;
 
     useEffect(() => {
-        const dataUrl = 'https://recipes-1373426606.cos.ap-shanghai.myqcloud.com/final_recipes_with_directions.json';
+        // --- 核心修改：将数据源地址指向您自己的VPS ---
+        const dataUrl = 'https://www.pocketfoxden.shop/final_recipes_with_directions.json';
+        
         fetch(dataUrl)
             .then(response => {
                 if (!response.ok) throw new Error('在线数据文件加载失败');
@@ -211,11 +209,9 @@ function App() {
 
         setFilteredRecipes(results);
         setStatus(`找到了 ${results.length} 个菜谱。`);
-        // MODIFIED: Reset to page 1 on new search
         setCurrentPage(1); 
     };
 
-    // NEW: Pagination Logic
     const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -238,7 +234,6 @@ function App() {
                 </button>
             </div>
             
-            {/* NEW: Render Pagination Component */}
             <Pagination 
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -248,23 +243,24 @@ function App() {
             <p>{status}</p>
 
             <div className="results">
-                {/* MODIFIED: Map over current page's recipes instead of all filtered recipes */}
                 {currentRecipes.map(recipe => (
                     <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
                         {recipe.image && <img src={getProxiedUrl(recipe.image)} alt={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
-                            {/* Note: React doesn't render <br> from strings by default for security. 
-                                This part's display might be different than intended.
-                                A better way would be to map over the lines and render them in separate divs or spans.
-                            */}
                             {(recipe.ingredients || '').split('\n').slice(0, 3).join('\n')}
                         </p>
                         <button onClick={() => setModalRecipe(recipe)}>查看做法</button>
                     </div>
                 ))}
             </div>
+
+            <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+            />
 
             {modalRecipe && <Modal recipe={modalRecipe} onClose={() => setModalRecipe(null)} />}
         </div>
