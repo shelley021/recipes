@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// --- 新增代码开始 ---
-const PROXY_PREFIX = 'http://139.180.190.178/image-proxy/';
-
-const getProxiedUrl = (originalUrl) => {
-  if (originalUrl && typeof originalUrl === 'string' && !originalUrl.startsWith('data:')) {
-    return PROXY_PREFIX + originalUrl;
-  }
-  return originalUrl; // 如果URL为空或已经是data URL，则返回原样
-};
-// --- 新增代码结束 ---
-
-
 // CSS styles remain the same
 const styles = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
@@ -79,7 +67,7 @@ function Modal({ recipe, onClose }) {
                 </div>
 
                 <h2>{recipe.name || '无标题菜谱'}</h2>
-                {recipe.image && <img src={getProxiedUrl(recipe.image)} alt={recipe.name || ''} />}
+                {recipe.image && <img src={recipe.image} alt={recipe.name || ''} />}
 
                 <h3>详细材料 (Ingredients)</h3>
                 <div>
@@ -252,7 +240,7 @@ function App() {
                 {currentRecipes.map(recipe => (
                     <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
-                        {recipe.image && <img src={getProxiedUrl(recipe.image)} alt={recipe.name || ''} />}
+                        {recipe.image && <img src={recipe.image} alt={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
                             {/* Note: React doesn't render <br> from strings by default for security. 
