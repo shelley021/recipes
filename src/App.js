@@ -28,7 +28,7 @@ const ImageWithFallback = ({ src, alt, recipeName, isDetailView = false }) => {
 
   const handleError = () => {
     const name = recipeName.toLowerCase();
-    const keywords = ['', 'fish', 'chicken', 'beef', 'pork', 'shrimp', 'tofu', 'noodle', 'rice', 'vegetable'];
+    const keywords = ['egg', 'fish', 'chicken', 'beef', 'pork', 'shrimp', 'tofu', 'noodle', 'rice', 'vegetable'];
     
     let fallbackImage = 'kitchen.jpg'; // 默认的通用备用图
 
@@ -52,12 +52,32 @@ const ImageWithFallback = ({ src, alt, recipeName, isDetailView = false }) => {
 };
 // --- 新增结束 ---
 
-// CSS样式 (无变化)
+// --- 核心修改：恢复完整的CSS样式 ---
 const styles = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-  /* ... 其他样式保持不变 ... */
+  .search-container { margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+  #search { padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+  .results { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px; justify-content: center; }
+  .recipe { border: 1px solid #ddd; padding: 15px; background: white; width: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; display: flex; flex-direction: column; transition: transform 0.2s; }
+  .recipe:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .recipe h3 { margin-top: 0; color: #333; }
   .recipe img { max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 10px; aspect-ratio: 4 / 3; object-fit: cover; background-color: #f0f0f0; }
+  .recipe p { flex-grow: 1; color: #555; font-size: 14px; }
+  button { padding: 8px 15px; margin: 0 5px; cursor: pointer; border: none; background-color: #007bff; color: white; border-radius: 4px; font-size: 14px; transition: background-color 0.2s; }
+  button:hover { background-color: #0056b3; }
+  button:disabled { background-color: #ccc; cursor: not-allowed; }
+  .pagination { margin-top: 20px; margin-bottom: 20px; width: 100%; text-align: center; display: flex; justify-content: center; align-items: center; gap: 5px; }
+  .pagination span, .pagination input { margin: 0 5px; }
+  .pagination input { padding: 5px; width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;}
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+  .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 90%; width: 700px; max-height: 85%; overflow-y: auto; position: relative; line-height: 1.6; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: width 0.3s, height 0.3s; }
+  .modal-content-maximized { width: 95%; max-width: 95%; height: 95%; max-height: 95%; }
+  .modal-content h2 { margin-top: 0; color: #333; padding-right: 70px; }
+  .modal-content h3 { margin-top: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; color: #007bff; }
   .modal-content img { max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px; background-color: #f0f0f0; }
+  .modal-controls { position: absolute; top: 10px; right: 15px; display: flex; gap: 10px; }
+  .modal-btn { cursor: pointer; background: #e0e0e0; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; line-height: 30px; text-align: center; color: #555; }
+  .modal-btn:hover { background: #d0d0d0; }
 `;
 
 // 辅助函数 (无变化)
@@ -90,7 +110,6 @@ function Modal({ recipe, onClose }) {
                     <button className="modal-btn" title="关闭" onClick={onClose}>×</button>
                 </div>
                 <h2>{recipe.name || '无标题菜谱'}</h2>
-                {/* --- 核心修改：使用新的智能图片组件 --- */}
                 {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} recipeName={recipe.name || ''} isDetailView={true} />}
                 <h3>详细材料 (Ingredients)</h3>
                 <div>
@@ -205,7 +224,6 @@ function App() {
                 {currentRecipes.map(recipe => (
                     <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
-                        {/* --- 核心修改：使用新的智能图片组件 --- */}
                         {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} recipeName={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
