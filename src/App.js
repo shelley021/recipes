@@ -27,7 +27,7 @@ const ImageWithFallback = ({ src, alt, isDetailView = false }) => {
   const [imageSrc, setImageSrc] = useState(isDetailView ? getOptimizedDetailUrl(src) : getOptimizedThumbnailUrl(src));
 
   const handleError = () => {
-    // 定义一个包含所有备用图片的数组
+    // 定义一个包含所有通用备用图片的数组
     const fallbackImages = ['kitchen.jpg', 'table1.jpg', 'table2.jpg'];
     // 从数组中随机选择一张图片
     const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
@@ -102,6 +102,7 @@ function Modal({ recipe, onClose }) {
                     <button className="modal-btn" title="关闭" onClick={onClose}>×</button>
                 </div>
                 <h2>{recipe.name || '无标题菜谱'}</h2>
+                {/* --- 核心修改：移除 recipeName 属性 --- */}
                 {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} isDetailView={true} />}
                 <h3>详细材料 (Ingredients)</h3>
                 <div>
@@ -216,6 +217,7 @@ function App() {
                 {currentRecipes.map(recipe => (
                     <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
+                        {/* --- 核心修改：移除 recipeName 属性 --- */}
                         {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
