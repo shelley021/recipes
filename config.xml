@@ -8,11 +8,16 @@
         Your Name
     </author>
     <content src="index.html" />
+    <!--- 核心修改：添加App图标 -->
+    <icon src="logo.jpg" />
+
     <access origin="*" />
     <allow-navigation href="*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="AndroidXEnabled" value="true" />
+
+x
     
     <!-- 核心修改：增加一个 platform 块，专门为安卓平台配置权限 -->
     <platform name="android">

@@ -22,37 +22,29 @@ const getOptimizedDetailUrl = (originalUrl) => {
   return originalUrl;
 };
 
-// --- 新增：智能图片组件，带加载失败自动替换功能 ---
-const ImageWithFallback = ({ src, alt, recipeName, isDetailView = false }) => {
+// --- 核心修改：智能图片组件，加载失败后随机显示备用图 ---
+const ImageWithFallback = ({ src, alt, isDetailView = false }) => {
   const [imageSrc, setImageSrc] = useState(isDetailView ? getOptimizedDetailUrl(src) : getOptimizedThumbnailUrl(src));
 
   const handleError = () => {
-    const name = recipeName.toLowerCase();
-    const keywords = ['egg', 'fish', 'chicken', 'beef', 'pork', 'shrimp', 'tofu', 'noodle', 'rice', 'vegetable'];
+    // 定义一个包含所有备用图片的数组
+    const fallbackImages = ['kitchen.jpg', 'table1.jpg', 'table2.jpg'];
+    // 从数组中随机选择一张图片
+    const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
     
-    let fallbackImage = 'kitchen.jpg'; // 默认的通用备用图
-
-    for (const keyword of keywords) {
-      if (name.includes(keyword)) {
-        fallbackImage = `${keyword}.jpg`; // 找到匹配的关键词，使用对应的备用图
-        break;
-      }
-    }
-    
-    // 直接从我们的服务器加载备用图，无需再通过代理或优化服务
-    setImageSrc(`https://${MY_DOMAIN}/placeholder-images/${fallbackImage}`);
+    // 直接从我们的服务器加载备用图
+    setImageSrc(`https://${MY_DOMAIN}/placeholder-images/${randomImage}`);
   };
 
   useEffect(() => {
-      // 当图片源改变时（例如用户点击不同的菜谱），重置图片地址
       setImageSrc(isDetailView ? getOptimizedDetailUrl(src) : getOptimizedThumbnailUrl(src));
   }, [src, isDetailView]);
 
   return <img src={imageSrc} alt={alt} onError={handleError} />;
 };
-// --- 新增结束 ---
+// --- 修改结束 ---
 
-// --- 核心修改：恢复完整的CSS样式 ---
+// CSS样式 (无变化)
 const styles = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
   .search-container { margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -110,7 +102,7 @@ function Modal({ recipe, onClose }) {
                     <button className="modal-btn" title="关闭" onClick={onClose}>×</button>
                 </div>
                 <h2>{recipe.name || '无标题菜谱'}</h2>
-                {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} recipeName={recipe.name || ''} isDetailView={true} />}
+                {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} isDetailView={true} />}
                 <h3>详细材料 (Ingredients)</h3>
                 <div>
                     <ol style={{ paddingLeft: '20px' }}>
@@ -224,7 +216,7 @@ function App() {
                 {currentRecipes.map(recipe => (
                     <div key={recipe._id && recipe._id.$oid ? recipe._id.$oid : recipe.name} className="recipe">
                         <h3>{recipe.name || '无标题'}</h3>
-                        {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} recipeName={recipe.name || ''} />}
+                        {recipe.image && <ImageWithFallback src={recipe.image} alt={recipe.name || ''} />}
                         <p style={{flexGrow: 1}}>
                             <b>材料预览:</b><br/>
                             {(recipe.ingredients || '').split('\n').slice(0, 3).join('\n')}
