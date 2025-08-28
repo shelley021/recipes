@@ -19,7 +19,7 @@
 
 x
     
-    <!-- 核心修改：增加一个 platform 块，专门为安卓平台配置权限 -->
+    <!-- 核心修改：增加一个 platform .块，专门为安卓平台配置权限 -->
     <platform name="android">
         <!-- 这一行是允许HTTP和HTTPS混合内容的关键 -->
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
