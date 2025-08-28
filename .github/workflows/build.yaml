@@ -40,17 +40,19 @@ jobs:
 
     - name: Create Cordova Project and Add Android Platform
       run: |
-        cordova create temp_build com.shelley021.recipes "智能食<em></em>食谱"
+        cordova create temp_build com.shelley021.recipes "智能食谱"
         cd temp_build
         cordova platform add android@11
     
-    # 3. 将“编译后”的网页文件和数据复制到打包目录
-    - name: Copy Built Assets and Config
+    # 3. 将“编译后”的网页文件、配置文件和图标复制到打包目录
+    - name: Copy Built Assets, Config, and Icon
       run: |
         # 将 build 文件夹里的所有内容复制到 www 目录
         cp -r build/* ./temp_build/www/
         # 复制配置文件
         cp config.xml ./temp_build/
+        # (新增) 复制App图标文件
+        cp logo.jpg ./temp_build/
     
     - name: Install Android Build Tools
       run: yes | sdkmanager --licenses > /dev/null && sdkmanager "build-tools;32.0.0"
