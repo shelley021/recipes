@@ -8,7 +8,7 @@
         Your Name
     </author>
     <content src="index.html" />
-    <!--- 核心修改：添加App图标 -->
+    <!--- 核心修改：.添加App图标 -->
     <icon src="logo.jpg" />
 
     <access origin="*" />
